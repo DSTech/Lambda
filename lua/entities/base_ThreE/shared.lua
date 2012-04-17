@@ -1,0 +1,9 @@
+ENT.Type = "anim";
+ENT.Base = "base_gmodentity";
+ENT.PrintName = "ThreE Base";
+ENT.Author = "MegaDeath";
+ENT.Contact = "MegaDeath409@gmail.com";
+ENT.Purpose = "Base Unit for ThreEs";
+ENT.Instructions = "Doesn't actually do anything unless modified by an expansion script.";
+ENT.Spawnable = false;
+ENT.AdminSpawnable = true;

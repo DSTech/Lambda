@@ -1,0 +1,13 @@
+"AddonInfo"
+{
+	"name"		"Lambda"
+	"version"	"GITREV"
+	"up_date"	""
+	"author_name"	"D6 Dev Team - Raw Lemons Division"
+	"author_email"	"RawLemons@D6Gaming.net"
+	"author_url"	"http://D6Gaming.net"
+	
+	"info"		"Lap's WMRTS redone for performance and usability, along with a new featureset."
+
+	"override"	"0"
+}
