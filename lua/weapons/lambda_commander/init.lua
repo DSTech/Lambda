@@ -47,5 +47,20 @@ function SWEP:GenericSelect(startpos, endpos, shape, mode)
 	return self.selection
 end
 
+function SWEP:IsCommandable(ent)
+	return((string.Left(ent:GetClass(),7)=="lambda_") and self:IsAlliedEnt(ent))
+end
+
+function SWEP:IsAlliedEnt(ent)
+	return true
+end
+
 function SWEP:SphereSelect(startpos, endpos)
+	local entlist = ents.FindInSphere(startpos, startpos:Distance(endpos))
+	for k,v in pairs(entlist)do
+		if(self:IsCommandable(v))then
+			entlist[k]=nil
+		end
+	end
+	return entlist
 end
