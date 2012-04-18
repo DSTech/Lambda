@@ -23,12 +23,6 @@ function SWEP:GenericSelect(startpos, endpos, shape, mode)
 		entlist = {}
 	end
 
-	for k,v in pairs(entlist) do
-		if(string.Left(v:GetClass(), 6)~="three_")then
-			entlist[k]=nil;
-		end
-	end
-
 	self.selection = {} or self.selection;
 	if(mode==1)then
 		self.selection = {};
@@ -58,7 +52,7 @@ end
 function SWEP:SphereSelect(startpos, endpos)
 	local entlist = ents.FindInSphere(startpos, startpos:Distance(endpos))
 	for k,v in pairs(entlist)do
-		if(self:IsCommandable(v))then
+		if not(self:IsCommandable(v))then
 			entlist[k]=nil
 		end
 	end
