@@ -3,12 +3,12 @@ AddCSLuaFile("cl_init.lua");
 AddCSLuaFile("shared.lua");
 
 TeamColorTable = {
-	[1]=Color(255,	0,		0,		255),
-	[2]=Color(0,		0,		255,	255),
-	[3]=Color(0,		255,	0,		255),
-	[4]=Color(255,	255,	0,		255),
-	[5]=Color(255,	0,		255,	255),
-	[6]=Color(0,		255,	255,	255),
+	[1]=Color(255,0,0,255),
+	[2]=Color(0,0,255,255),
+	[3]=Color(0,255,0,255),
+	[4]=Color(255,255,0,255),
+	[5]=Color(255,0,255,255),
+	[6]=Color(0,255,255,255),
 	nil
 }
 

@@ -73,11 +73,11 @@ end
 
 function SWEP:SphereSelect(startpos, endpos)
 	local entlist = ents.FindInSphere(startpos, math.max(startpos:Distance(endpos), 1))
+	local outlist = {}
 	for k,v in pairs(entlist)do
-		if not(self:IsCommandable(v) and (v:GetClass() ~= "lambda_commander"))then
-			self.Owner:ChatPrint(v:GetClass().." was not commandable.")
-			entlist[k]=nil
+		if(self:IsCommandable(v) and (v:GetClass() ~= "lambda_commander"))then
+			table.insert(outlist, v)
 		end
 	end
-	return entlist
+	return outlist
 end
