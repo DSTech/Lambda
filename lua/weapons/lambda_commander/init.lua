@@ -24,11 +24,7 @@ function SWEP:EndSelect(pos,shape)
 	self.Owner:ChatPrint("Mode was: "..self.cursel.mode)	
 	local entlist = self:ShapeSelect(self.cursel.startpos, self.cursel.endpos, self.cursel.shape, self.cursel.mode)
 	self.cursel = nil
-	local count = 0
-	for k,v in pairs(entlist)do
-		count = count + 1
-	end
-	self.Owner:ChatPrint("Selected "..count)
+	self.Owner:ChatPrint("Selected "..#entlist)
 end
 
 function SWEP:CancelSelect()
@@ -68,7 +64,7 @@ function SWEP:IsCommandable(ent)
 end
 
 function SWEP:IsAlliedEnt(ent)
-	return true
+	return dteams.isAlly(self.Owner, ent)
 end
 
 function SWEP:SphereSelect(startpos, endpos)
