@@ -64,7 +64,7 @@ function SWEP:IsCommandable(ent)
 end
 
 function SWEP:IsAlliedEnt(ent)
-	return dteams.isAlly(self.Owner, ent)
+	return dTeams.isAlly(self.Owner, ent)
 end
 
 function SWEP:SphereSelect(startpos, endpos)
