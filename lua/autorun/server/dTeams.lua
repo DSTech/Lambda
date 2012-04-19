@@ -61,7 +61,7 @@ function dTeams.addTeam(sName, cColor)
 		entities = {},
 		alliance = dTeams.getNeutralAlliance().name
 		}
-	if dTeams._Teams[sName]==nil return false end
+	if dTeams._Teams[sName]==nil then return false end
 	return true
 end
 
@@ -92,7 +92,7 @@ function dTeams.setTeam(team, ent)
 end
 
 function dTeams.getTeam(this)
-	if this==nil then return dTeams.getNeutralTeam()
+	if this==nil then return dTeams.getNeutralTeam() end
 	if (this:IsPlayer()) then
 		return dTeams._Players[this]
 	else
@@ -116,7 +116,7 @@ function dTeams.getEntityAlliance(ent)
 	if ent==nil then return getNeutralAlliance() end
 	if dTeams._Entities[ent]!=nil then
 		return dTeams._Alliances[dTeams._Teams[dTeams._Entities[ent]].alliance]
-	else if dTeams._Players[ent]!=nil then 
+	elseif dTeams._Players[ent]!=nil then 
 		return dTeams._Alliances[dTeams._Teams[dTeams._Players[ent]].alliance]
 	end
 	return getNeutralAlliance()
