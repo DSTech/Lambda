@@ -17,7 +17,7 @@ function ENT:SpawnFunction(ply, tr)
  
 	local SpawnPos = tr.HitPos + tr.HitNormal * 36
  
-	local ent = ents.Create( "base_three" )
+	local ent = ents.Create( "lambda_base" )
 	ent:SetPos( SpawnPos )
 	ent:Spawn()
 	ent:Activate()

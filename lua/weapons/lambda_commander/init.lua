@@ -4,18 +4,40 @@ include("shared.lua")
 SWEP.Weight = 5
 SWEP.AutoSwitchTo = false
 SWEP.AutoSwitchFrom = false
+SWEP.selection = {}
+SWEP.cursel = nil
 
 function SWEP:StartSelect(pos)
+	if self.cursel then
+		return
+	end
+	self.cursel = {startpos = pos}
 end
 
 function SWEP:EndSelect(pos,shape)
+	if not self.cursel then
+		return
+	end
+	self.cursel.shape = "radial"
+	self.cursel.endpos = pos
+	self.cursel.mode = ((self.Owner:KeyDown(IN_RUN) and 2) or (self.Owner:KeyDown(IN_WALK) and 3)) or 1;
+	self.Owner:ChatPrint("Mode was: "..self.cursel.mode)	
+	local entlist = self:ShapeSelect(self.cursel.startpos, self.cursel.endpos, self.cursel.shape, self.cursel.mode)
+	self.cursel = nil
+	local count = 0
+	for k,v in pairs(entlist)do
+		count = count + 1
+	end
+	self.Owner:ChatPrint("Selected "..count)
 end
 
 function SWEP:CancelSelect()
+	self.cursel = nil
 end
 
-function SWEP:GenericSelect(startpos, endpos, shape, mode)
+function SWEP:ShapeSelect(startpos, endpos, shape, mode)
 	mode = mode or 1;
+	shape = shape or "radial";
 	local entlist
 	if(shape=="radial")then
 		entlist = self:SphereSelect(startpos, endpos)
@@ -23,7 +45,7 @@ function SWEP:GenericSelect(startpos, endpos, shape, mode)
 		entlist = {}
 	end
 
-	self.selection = {} or self.selection;
+	self.selection = self.selection or {};
 	if(mode==1)then
 		self.selection = {};
 		for k,v in pairs(entlist) do
@@ -50,9 +72,10 @@ function SWEP:IsAlliedEnt(ent)
 end
 
 function SWEP:SphereSelect(startpos, endpos)
-	local entlist = ents.FindInSphere(startpos, startpos:Distance(endpos))
+	local entlist = ents.FindInSphere(startpos, math.max(startpos:Distance(endpos), 1))
 	for k,v in pairs(entlist)do
-		if not(self:IsCommandable(v))then
+		if not(self:IsCommandable(v) and (v:GetClass() ~= "lambda_commander"))then
+			self.Owner:ChatPrint(v:GetClass().." was not commandable.")
 			entlist[k]=nil
 		end
 	end
