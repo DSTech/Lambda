@@ -7,7 +7,7 @@
 	"author_email"	"RawLemons@D6Gaming.net"
 	"author_url"	"http://D6Gaming.net"
 	
-	"info"		"Lap's WMRTS redone for performance and usability, along with a new featureset."
+	"info"		"Lap's War Melons RTS redone for performance and usability, along with a new featureset and advanced control systems such as fortress maintenance AIs."
 
 	"override"	"0"
 }
