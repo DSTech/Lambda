@@ -20,15 +20,22 @@ function SWEP:EndSelect(pos,shape)
 	end
 	self.cursel.shape = "radial"
 	self.cursel.endpos = pos
-	self.cursel.mode = ((self.Owner:KeyDown(IN_RUN) and 2) or (self.Owner:KeyDown(IN_WALK) and 3)) or 1;
-	self.Owner:ChatPrint("Mode was: "..self.cursel.mode)	
+	self.cursel.mode = ((self.Owner:KeyDown(IN_SPEED) and 2) or (self.Owner:KeyDown(IN_WALK) and 3)) or 1;
 	local entlist = self:ShapeSelect(self.cursel.startpos, self.cursel.endpos, self.cursel.shape, self.cursel.mode)
 	self.cursel = nil
-	self.Owner:ChatPrint("Selected "..#entlist)
+	local count = 0
+	for k,v in pairs(entlist) do
+		count = count + 1
+	end
+	self.Owner:ChatPrint(count.." Unit"..((count==1 and " is")or"s are").." Selected.")
 end
 
 function SWEP:CancelSelect()
 	self.cursel = nil
+end
+
+function SWEP:ClearSelection()
+	self.selection = {}
 end
 
 function SWEP:ShapeSelect(startpos, endpos, shape, mode)
@@ -43,7 +50,7 @@ function SWEP:ShapeSelect(startpos, endpos, shape, mode)
 
 	self.selection = self.selection or {};
 	if(mode==1)then
-		self.selection = {};
+		self:ClearSelection()
 		for k,v in pairs(entlist) do
 			self.selection[v]=v;
 		end
@@ -51,7 +58,7 @@ function SWEP:ShapeSelect(startpos, endpos, shape, mode)
 		for k,v in pairs(entlist) do
 			self.selection[v]=v;
 		end
-	else--(mode==3)
+	elseif(mode==3)then
 		for k,v in pairs(entlist) do
 			self.selection[v]=nil;
 		end
@@ -60,11 +67,12 @@ function SWEP:ShapeSelect(startpos, endpos, shape, mode)
 end
 
 function SWEP:IsCommandable(ent)
-	return((string.Left(ent:GetClass(),7)=="lambda_") and self:IsAlliedEnt(ent))
+	return((string.Left(ent:GetClass(),7)=="lambda_") and self:IsOwnedEnt(ent))
 end
 
-function SWEP:IsAlliedEnt(ent)
-	return dTeams.isAlly(self.Owner, ent)
+function SWEP:IsOwnedEnt(ent)
+	local ownerTeam = dTeams:getTeam(self.Owner)
+	return (ownerTeam and ownerTeam == dTeams:getTeam(ent))
 end
 
 function SWEP:SphereSelect(startpos, endpos)
@@ -76,4 +84,14 @@ function SWEP:SphereSelect(startpos, endpos)
 		end
 	end
 	return outlist
+end
+
+function SWEP:AssignOrder(ent, command)
+	ent:Order(command)
+end
+
+function SWEP:DistributeOrder(entlist, command)
+	for k,v in pairs(entlist)do
+		self:AssignCommand(ent, command)
+	end
 end

@@ -40,7 +40,7 @@ end
 function SWEP:DrawRadialSelection(center, edge)
 	local len = center:Distance(edge)
 	
-	local LaserColor = self.LaserColor;
+	local LaserColor = self.LaserColor;--dTeams:getTeamColor(dTeams:getTeam(self.Owner));--To be added when dTeams syncs with client.
 	render.SetMaterial(self.LaserMat)
 	cam.Start3D(LocalPlayer():GetShootPos(), LocalPlayer():GetAngles())
 	render.DrawBeam(center, edge, 2,1,1, LaserColor)

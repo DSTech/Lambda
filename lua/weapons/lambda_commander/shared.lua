@@ -10,9 +10,10 @@ SWEP.AdminSpawnable = true
 
 SWEP.LeftDown = false
 SWEP.RightDown = false
+SWEP.ReloadDown = false
 
 function SWEP:Think()
-	local leftdown,rightdown = self.Owner:KeyDown(IN_ATTACK),self.Owner:KeyDown(IN_ATTACK2)
+	local leftdown,rightdown,reloaddown = self.Owner:KeyDown(IN_ATTACK),self.Owner:KeyDown(IN_ATTACK2),self.Owner:KeyDown(IN_RELOAD)
 	if(leftdown and (not self.LeftDown))then
 		self.LeftDown=true;
 		self:StartLeftClick();
@@ -27,6 +28,13 @@ function SWEP:Think()
 		self.RightDown=false;
 		self:EndRightClick();
 	end
+	if(reloaddown and (not self.ReloadDown))then
+		self.ReloadDown=true;
+		self:StartReload();
+	elseif((not reloaddown) and self.ReloadDown)then
+		self.ReloadDown=false;
+		self:EndReload();
+	end
 end
 
 function SWEP:PrimaryAttack()
@@ -37,6 +45,9 @@ function SWEP:SecondaryAttack()
 	self:Think()
 end
 
+function SWEP:Reload()
+	self:Think()
+end
 --------------------------------------------------------
 
 function SWEP:StartLeftClick()
@@ -49,4 +60,14 @@ end
 function SWEP:StartRightClick()
 end
 function SWEP:EndRightClick()
+end
+
+function SWEP:StartReload()
+	if(SERVER)then
+		self:ClearSelection()
+	else
+		self.Owner:ChatPrint("Selection cleared.")
+	end
+end
+function SWEP:EndReload()
 end
