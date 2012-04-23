@@ -30,17 +30,17 @@
 		Returns true if team1 and team2 are on the same, non-default alliance
 ]]--
 
-local dTeamsLib = {
-	_Teams = dTeams._Teams or {
+local dTeamsLib = dTeams or {
+	_Teams = {
 		["Independents"]={name="Independents", color=Color(0,255,255,255), players = {}, entities = {}, alliance = "No Alliance" }
 	},
-	_Entities = dTeams._Entities or {
+	_Entities = {
 		--[entity] = "teamname"
 	},
-	_Players = dTeams._Players or {
+	_Players = {
 		--[player] = "teamname"
 	},
-	_Alliances = dTeams._Alliances or {
+	_Alliances = {
 		["No Alliance"] = {
 			name = "No Alliance",
 			color = Color(200,200,200,255),
@@ -81,7 +81,7 @@ end
 function dTeamsLib:setTeam(ent,team)
 	if (team==nil) then print("teamnil") return false end
 	if (ent==nil) then print("entnil") return false end
-	if self._Teams[team]==nil then print("teamnoexisto") return false end
+	if self._Teams[team]==nil then print(team,"teamnoexisto") return false end
 	if (ent:IsPlayer()) then
 		self._Players[ent] = team
 		table.insert(self._Teams[team].players, ent)

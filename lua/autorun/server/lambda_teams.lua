@@ -9,8 +9,9 @@ end)
 
 pcall(concommand.Remove, "CreateTeam")
 concommand.Add("CreateTeam", function(plr,cmd,args)
-	if(dTeams._Teams[args[1]])then
-		dTeams:setTeam(plr, args[1])
+	if not(dTeams._Teams[args[1]])then
+		dTeams:addTeam(args[1], Color(math.random(255),math.random(255),math.random(255),255))
+		plrSetTeam(plr, args[1])
 		plr:ChatPrint("You've created the team \""..args[1].."\"!")
 	else
 		plr:ChatPrint("The team \""..args[1].."\" already exists.")
@@ -28,5 +29,5 @@ function plrSetTeam(plr,Team)
 			v:ClearSelection()
 		end
 	end
-	return dTeams._Teams[Team] and dTeams:setTeam(plr, Team)
+	return (dTeams._Teams[Team] and dTeams:setTeam(plr, Team))
 end
