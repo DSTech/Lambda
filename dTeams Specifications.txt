@@ -1,0 +1,14 @@
+dTeams Construction Parameters:
+
+Unset team variable should be assumed as neutral, and should therefore not qualify as an enemy under any circumstances,
+	nor should they be counted as allies.
+
+Targetting of enemy units should not be done by checking if the questioned unit is an ally, but rather that it is an enemy,
+	this is to allow allow .
+	Example:
+		if(dTeams:isEnemy(self, target))then...
+	Wrong:
+		if not(dTeams:isAlly(self, target))then...
+
+A team is composed of entities, and any entity within that team will return true on an isOnTeam() as well as isAlly() call,
+	while isAlly will also return true on units in any team within the same alliance as the unit itself.
