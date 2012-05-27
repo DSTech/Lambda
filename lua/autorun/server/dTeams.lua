@@ -3,27 +3,27 @@
          dTeams
 		 
 	addTeam(name, color)
-		Creates an empty team named 'name' with the color 'color'
+		Creates an empty Team named 'name' with the color 'color'
 	addAlliance(name, color)
 		Creates an empty alliance named 'name' with color 'color'
-	setTeam(ent,team)
-		Sets 'ent's team to 'team'
+	setTeam(ent,Team)
+		Sets 'ent's Team to 'Team'
 	getTeam(ent)
-		Returns 'ent's team
+		Returns 'ent's Team
 	getTeamColor(ent)
-		Returns the color of the team
+		Returns the color of the Team
 	getTeamByName(name)
-		Returns the team table for the team with name 'name'
+		Returns the Team table for the Team with name 'name'
 	isAlly(ent1, ent2)
 		Returns true if ent1 and ent2 are on the same alliance.
 	isEnemy(ent1, ent2)
 		Returns true if ent1 and ent2 are on different alliances
 	getDefaultTeam()
-		Returns the table of the default/neutral team.
+		Returns the table of the default/neutral Team.
 	getDefaultAlliance()
 		Returns the table of the default/neutral alliance.
-	getAlliance(team)
-		Returns the alliance table of 'team'
+	getAlliance(Team)
+		Returns the alliance table of 'Team'
 	getEntityAlliance(ent)
 		Returns the alliance table of 'ent'
 	teamsAllied(team1, team2)
@@ -32,13 +32,10 @@
 
 local dTeamsLib = dTeams or {
 	_Teams = {
-		["Independents"]={name="Independents", color=Color(0,255,255,255), players = {}, entities = {}, alliance = "No Alliance" }
+		["Independent"]={name="Independent", color=Color(0,255,255,255), entities = {}, alliance = "No Alliance" }
 	},
 	_Entities = {
 		--[entity] = "teamname"
-	},
-	_Players = {
-		--[player] = "teamname"
 	},
 	_Alliances = {
 		["No Alliance"] = {
@@ -59,7 +56,6 @@ function dTeamsLib:addTeam(sName, cColor)
 	self._Teams[sName] = {
 		name = sName,
 		color = cColor,
-		players = {},
 		entities = {},
 		alliance = self:getDefaultAlliance().name
 	}
@@ -78,37 +74,40 @@ function dTeamsLib:addAlliance(sName, cColor)
 	return true
 end
 
-function dTeamsLib:setTeam(ent,team)
-	if (team==nil) then print("teamnil") return false end
+function dTeamsLib:setTeam(ent,Team)
+	if (Team==nil) then print("teamnil") return false end
 	if (ent==nil) then print("entnil") return false end
-	if self._Teams[team]==nil then print(team,"teamnoexisto") return false end
-	if (ent:IsPlayer()) then
-		self._Players[ent] = team
-		table.insert(self._Teams[team].players, ent)
-	else
-		self._Entities[ent] = team
-		table.insert(self._Teams[team].entities, ent)
+	if self._Teams[Team]==nil then print(Team,"teamnoexisto") return false end
+	
+	--Remove this entity from another team, if it exists within it
+	local tm = self:getTeam(ent)
+	if(tm)then
+		for k,v in pairs(self._Teams[Team].entities)do
+			if(v == ent)then
+				table.remove(self._Teams[Team].entities, k)
+				break
+			end
+		end
 	end
+	
+	self._Entities[ent] = Team
+	table.insert(self._Teams[Team].entities, ent)
 	return true
 end
 
-function dTeamsLib:getTeam(this)
-	if this==nil then return nil end
-	if (this:IsPlayer()) then
-		return self._Players[this]
-	else
-		return self._Entities[this]
-	end
+function dTeamsLib:getTeam(ent)
+	if ent==nil then return nil end
+	return self._Entities[ent]
 end
 
 function dTeamsLib:getTeamColor(ent)
 	return (self._Teams[self:getTeam(ent)] or self:getDefaultTeam()).color
 end
 
-function dTeamsLib:getAlliance(team)
-	if team==nil then return self:getDefaultAlliance() end
-	if self._Teams[team] == nil then return false end
-	return self._Alliances[self._Teams[team].alliance]
+function dTeamsLib:getAlliance(Team)
+	if Team==nil then return self:getDefaultAlliance() end
+	if self._Teams[Team] == nil then return false end
+	return self._Alliances[self._Teams[Team].alliance]
 end
 
 function dTeamsLib:getAllianceByName(alliance)
@@ -120,18 +119,16 @@ function dTeamsLib:getEntityAlliance(ent)
 	if ent==nil then return getDefaultAlliance() end
 	if self._Entities[ent]!=nil then
 		return self._Alliances[self._Teams[self._Entities[ent]].alliance]
-	elseif self._Players[ent]!=nil then 
-		return self._Alliances[self._Teams[self._Players[ent]].alliance]
 	end
 	return getDefaultAlliance()
 end
 
-function dTeamsLib:setAlliance(team, alliance)
-	if self._Teams[team] == nil then return false end
+function dTeamsLib:setAlliance(Team, alliance)
+	if self._Teams[Team] == nil then return false end
 	if self._Alliances[alliance] == nil then return false end
-	table.remove(self._Alliances[ self._Teams[team].alliance ].teams, team)
-	self._Alliances[alliance].teams[team] = true
-	self._Teams[team].alliance = alliance
+	table.remove(self._Alliances[ self._Teams[Team].alliance ].teams, Team)
+	self._Alliances[alliance].teams[Team] = true
+	self._Teams[Team].alliance = alliance
 	return true
 end
 
@@ -140,7 +137,7 @@ function dTeamsLib:getDefaultAlliance()
 end
 
 function dTeamsLib:getDefaultTeam()
-	return self._Teams["Independents"]
+	return self._Teams["Independent"]
 end
 
 function dTeamsLib:getTeamByName(name)
@@ -165,12 +162,8 @@ function dTeamsLib:teamsAllied(team1, team2)
 	return self:getAlliance(team1)==self:getAlliance(team2)
 end
 
-function dTeamsLib:getTeamEntities(team)
-	return self._Teams[team].entities
-end
-
-function dTeamsLib:getTeamPlayers(team)
-	return self._Teams[team].players
+function dTeamsLib:getTeamEntities(Team)
+	return self._Teams[Team].entities
 end
 
 function dTeamsLib:getTeamsInAlliance(alliance)
