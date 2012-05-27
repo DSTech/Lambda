@@ -32,22 +32,32 @@
 
 local dTeamsLib = dTeams or {
 	_Teams = {
+		--["TeamName"] = Team
 		["Independent"]={name="Independent", color=Color(0,255,255,255), entities = {}, alliance = "No Alliance" }
 	},
 	_Entities = {
 		--[entity] = "teamname"
 	},
 	_Alliances = {
+		--["AllianceName"] = Alliance
 		["No Alliance"] = {
 			name = "No Alliance",
 			color = Color(200,200,200,255),
 			teams = {
-				["Neutral"] = true
+				["Independent"] = true
 			}
 		}
 		--["AllianceName"] = { name = "name", color = Color(), teams = {"Team1" = true, "Team2" = true} }
 	}
 }
+
+function dTeamsLib:getTeams()
+	return self._Teams
+end
+
+function dTeamsLib:getAlliances()
+	return self._Alliances
+end
 
 function dTeamsLib:addTeam(sName, cColor)
 	if (sName==nil) then return false end
@@ -74,24 +84,29 @@ function dTeamsLib:addAlliance(sName, cColor)
 	return true
 end
 
-function dTeamsLib:setTeam(ent,Team)
-	if (Team==nil) then print("teamnil") return false end
+function dTeamsLib:setTeam(ent,TeamName)
+	if (TeamName==nil) then print("teamnil") return false end
 	if (ent==nil) then print("entnil") return false end
-	if self._Teams[Team]==nil then print(Team,"teamnoexisto") return false end
+	if self._Teams[TeamName]==nil then print(TeamName,"teamnoexisto") return false end
 	
 	--Remove this entity from another team, if it exists within it
 	local tm = self:getTeam(ent)
-	if(tm)then
-		for k,v in pairs(self._Teams[Team].entities)do
-			if(v == ent)then
-				table.remove(self._Teams[Team].entities, k)
-				break
+	if(tm ~= TeamName)then
+		if(tm)then
+			for k,v in pairs(self._Teams[TeamName].entities)do
+				if(v == ent)then
+					table.remove(self._Teams[TeamName].entities, k)
+					break
+				end
 			end
 		end
+		table.insert(self._Teams[TeamName].entities, ent)
+		
+		ent:SetNetworkedString("dTeam",TeamName)
 	end
 	
-	self._Entities[ent] = Team
-	table.insert(self._Teams[Team].entities, ent)
+	self._Entities[ent] = TeamName
+	
 	return true
 end
 
@@ -104,10 +119,10 @@ function dTeamsLib:getTeamColor(ent)
 	return (self._Teams[self:getTeam(ent)] or self:getDefaultTeam()).color
 end
 
-function dTeamsLib:getAlliance(Team)
-	if Team==nil then return self:getDefaultAlliance() end
-	if self._Teams[Team] == nil then return false end
-	return self._Alliances[self._Teams[Team].alliance]
+function dTeamsLib:getAlliance(TeamName)
+	if TeamName==nil then return self:getDefaultAlliance() end
+	if self._Teams[TeamName] == nil then return false end
+	return self._Alliances[self._Teams[TeamName].alliance]
 end
 
 function dTeamsLib:getAllianceByName(alliance)
@@ -123,12 +138,12 @@ function dTeamsLib:getEntityAlliance(ent)
 	return getDefaultAlliance()
 end
 
-function dTeamsLib:setAlliance(Team, alliance)
-	if self._Teams[Team] == nil then return false end
+function dTeamsLib:setAlliance(TeamName, alliance)
+	if self._Teams[TeamName] == nil then return false end
 	if self._Alliances[alliance] == nil then return false end
-	table.remove(self._Alliances[ self._Teams[Team].alliance ].teams, Team)
-	self._Alliances[alliance].teams[Team] = true
-	self._Teams[Team].alliance = alliance
+	self._Alliances[ self._Teams[TeamName].alliance ].teams[TeamName]=nil
+	self._Alliances[alliance].teams[TeamName] = true
+	self._Teams[TeamName].alliance = alliance
 	return true
 end
 

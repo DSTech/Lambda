@@ -23,11 +23,11 @@ concommand.Add("CreateTeam", function(plr,cmd,args)
 	end
 end)
 
-function plrSetTeam(plr,Team)
+function plrSetTeam(plr,TeamName)
 	for k,v in pairs(plr:GetWeapons())do
 		if(v:GetClass()=="lambda_commander")then
 			v:ClearSelection()
 		end
 	end
-	return (dTeams._Teams[Team] and dTeams:setTeam(plr, Team))
+	return (dTeams._Teams[TeamName] and dTeams:setTeam(plr, TeamName))
 end
