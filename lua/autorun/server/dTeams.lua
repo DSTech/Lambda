@@ -106,7 +106,6 @@ function dTeamsLib:setTeam(ent,TeamName)
 	end
 	
 	self._Entities[ent] = TeamName
-	
 	return true
 end
 
@@ -198,3 +197,4 @@ function dTeamsLib:mergeAlliances(majorally, minorally)
 end
 
 _G.dTeams = dTeamsLib
+AddCSLuaFile("autorun/client/dTeams_cl.lua")
