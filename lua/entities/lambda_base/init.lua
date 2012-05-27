@@ -46,10 +46,72 @@ function ENT:Initialize()
 		physics:SetDamping(0.75,0.75)
 		self.Entity:SetColor(self.TeamColor)
 	end
+	self:initMovement()
 end
 
 function ENT:Think()
+	if(self:mustMove())then
+		self:performMovement()
+	end
+	self:NextThink(CurTime()+0.0025)
+	return true
 end
 
 function ENT:OnRemove()
+end
+
+function ENT:Order(command)
+	if(command.type == "move")then
+		self:setMoveTarget(command.pos)
+	end
+end
+
+local defaultMoveTable = {
+    Target = nil,
+    OnTarget = false,
+    TargetThreshold = 10,
+    MaxSpeed = 100,
+    MaxForce = 250,
+    UserData = nil,
+    P = 0.4,--0.6,
+    I = 0.001,--0,
+    D = 1.5,--2,
+    LE = Vector(0,0,0),
+    TE = Vector(0,0,0),
+    DE = Vector(0,0,0)
+}
+
+function ENT:initMovement()
+    self._move = {}
+	for k,v in pairs(defaultMoveTable)do
+		self._move[k] = v
+	end
+end
+
+function ENT:setMoveTarget(pos, udata)
+	local _move = self._move
+    _move.UserData = udata
+    _move.Target = pos
+    _move.TE = Vector(0,0,0)
+    _move.DE = Vector(0,0,0)
+    _move.LE = Vector(0,0,0)
+end
+
+function ENT:mustMove()
+    if self._move.Target == nil then return nil end
+    self._move.OnTarget = (self._move.Target - self:GetPos()):LengthSqr() < math.pow(self._move.TargetThreshold, 2)
+    return ( not self._move.OnTarget )
+end
+
+function ENT:performMovement()
+	local _move = self._move
+    local error = _move.Target - self:GetPos()
+    _move.TE = _move.TE + error
+    _move.DE = error - _move.LE
+    _move.LE = error
+    local force = _move.P*error + _move.I*_move.TE + _move.D*_move.DE
+    --force = Angle(force:GetNormalized()):Right()*math.min(force:Length(), _move.MaxForce)
+    --self:GetPhysicsObject():AddAngleVelocity(force - self:GetPhysicsObject():GetAngleVelocity())
+	force = force:Normalize() * math.min(force:Length(), _move.MaxForce*FrameTime())
+    self:GetPhysicsObject():ApplyForceCenter(force)
 end

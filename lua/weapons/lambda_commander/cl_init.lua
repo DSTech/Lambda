@@ -9,24 +9,24 @@ SWEP.DrawCrosshair = true
 SWEP.LaserMat = Material("cable/cable2")
 SWEP.LaserColor = Color(0,0,255,255)
 
-SWEP.curSelect = nil
-function SWEP:StartSelect(pos)
-	self.curSelect = {
-		startpos = pos
-	}
+function SWEP:SelectionChanged()
+	local count = 0
+	for k,v in pairs(self.selection) do
+		count = count + 1
+	end
+	self.Owner:ChatPrint(count.." Unit"..((count==1 and " is")or"s are").." Selected.")
 end
 
-function SWEP:EndSelect(pos,shape)
-	self.curSelect = nil
-end
-
-function SWEP:CancelSelect()
-	self.curSelect = nil
+function SWEP:ClearSelection(notify)
+	if(notify)then self.Owner:ChatPrint("Selection cleared.") end
+	self.selection = {}
 end
 
 function SWEP:DrawHUD()
-	if(self.curSelect)then
-		local tr = self.Owner:GetEyeTrace() if(tr.Hit)then self:DrawSelection(self.curSelect.startpos, tr.HitPos) end
+	if(self.cursel)then
+		local tr = self.Owner:GetEyeTrace() if(tr.Hit)then self:DrawSelection(self.cursel.startpos, tr.HitPos) end
+	else
+		self:DrawCurrentSelection()
 	end
 end
 
@@ -35,6 +35,10 @@ function SWEP:DrawSelection(startpos, endpos, shape)
 	if(shape=="radial")then
 		return self:DrawRadialSelection(startpos, endpos)
 	end
+end
+
+local pos,material,white = Vector(0,0,0), Material( "sprites/splodesprite" ),Color(255,255,255,255)
+function SWEP:DrawCurrentSelection()
 end
 
 function SWEP:DrawRadialSelection(center, edge)
@@ -70,4 +74,7 @@ function SWEP:DrawRadialSelection(center, edge)
 	render.DrawBeam(center, center+(tempEndps-tempStrps):GetNormal()*len,2,1,1,LaserColor)
 	
 	cam.End3D()
+end
+
+function SWEP:Order(command)
 end
