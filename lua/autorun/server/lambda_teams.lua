@@ -1,3 +1,16 @@
+pcall(concommand.Remove, "ListTeams")
+concommand.Add("ListTeams", function(plr,cmd,args)
+	plr:ChatPrint("List of teams:")
+	for k,v in pairs(dTeams:getTeams())do
+		plr:ChatPrint(v.name)
+	end
+end)
+
+pcall(concommand.Remove, "ShowTeam")
+concommand.Add("ShowTeam", function(plr,cmd,args)
+	plr:ChatPrint("You are on team \""..tostring(dTeams:getTeam(plr)).."\"")
+end)
+
 pcall(concommand.Remove, "JoinTeam")
 concommand.Add("JoinTeam", function(plr,cmd,args)
 	if(plrSetTeam(plr, args[1]))then
