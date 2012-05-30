@@ -71,11 +71,11 @@ local defaultMoveTable = {
     OnTarget = false,
     TargetThreshold = 10,
     MaxSpeed = 100,
-    MaxForce = 250,
+    MaxForce = 350,
     UserData = nil,
-    P = 0.4,--0.6,
-    I = 0.001,--0,
-    D = 1.5,--2,
+    P = 0.6,
+    I = 0,
+    D = 2,
     LE = Vector(0,0,0),
     TE = Vector(0,0,0),
     DE = Vector(0,0,0)
@@ -98,9 +98,10 @@ function ENT:setMoveTarget(pos, udata)
 end
 
 function ENT:mustMove()
-    if self._move.Target == nil then return nil end
-    self._move.OnTarget = (self._move.Target - self:GetPos()):LengthSqr() < math.pow(self._move.TargetThreshold, 2)
-    return ( not self._move.OnTarget )
+	local _move = self._move
+    if _move.Target == nil then return nil end
+    _move.OnTarget = (_move.Target - self:GetPos()):LengthSqr() < math.pow(_move.TargetThreshold, 2)
+    return ( not _move.OnTarget )
 end
 
 function ENT:performMovement()
