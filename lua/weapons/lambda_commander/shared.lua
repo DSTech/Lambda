@@ -132,7 +132,7 @@ function SWEP:EndSelect(pos,shape)
 	if not self.cursel then
 		return
 	end
-	self.cursel.shape = "radial"
+	self.cursel.shape = shape or "radial"
 	self.cursel.endpos = pos
 	self.cursel.mode = ((self.Owner:KeyDown(IN_SPEED) and 2) or (self.Owner:KeyDown(IN_WALK) and 3)) or 1;
 	local entlist = self:ShapeSelect(self.cursel.startpos, self.cursel.endpos, self.cursel.shape, self.cursel.mode)

@@ -71,11 +71,11 @@ local defaultMoveTable = {
     OnTarget = false,
     TargetThreshold = 10,
     MaxSpeed = 100,
-    MaxForce = 350,
+    MaxForce = 200,
     UserData = nil,
-    P = 0.6,
+    P = 100,
     I = 0,
-    D = 2,
+    D = -2,
     LE = Vector(0,0,0),
     TE = Vector(0,0,0),
     DE = Vector(0,0,0)
@@ -90,29 +90,30 @@ end
 
 function ENT:setMoveTarget(pos, udata)
 	local _move = self._move
-    _move.UserData = udata
-    _move.Target = pos
-    _move.TE = Vector(0,0,0)
-    _move.DE = Vector(0,0,0)
-    _move.LE = Vector(0,0,0)
+	_move.UserData = udata
+	_move.Target = pos
+	_move.TE = Vector(0,0,0)
+	_move.DE = Vector(0,0,0)
+	_move.LE = Vector(0,0,0)
 end
 
 function ENT:mustMove()
 	local _move = self._move
-    if _move.Target == nil then return nil end
-    _move.OnTarget = (_move.Target - self:GetPos()):LengthSqr() < math.pow(_move.TargetThreshold, 2)
-    return ( not _move.OnTarget )
+	if _move.Target == nil then return nil end
+	_move.OnTarget = (_move.Target - self:GetPos()):LengthSqr() < math.pow(_move.TargetThreshold, 2)
+	return ( not _move.OnTarget )
 end
 
 function ENT:performMovement()
+	local time = FrameTime()
 	local _move = self._move
-    local error = _move.Target - self:GetPos()
-    _move.TE = _move.TE + error
-    _move.DE = error - _move.LE
-    _move.LE = error
-    local force = _move.P*error + _move.I*_move.TE + _move.D*_move.DE
-    --force = Angle(force:GetNormalized()):Right()*math.min(force:Length(), _move.MaxForce)
-    --self:GetPhysicsObject():AddAngleVelocity(force - self:GetPhysicsObject():GetAngleVelocity())
-	force = force:Normalize() * math.min(force:Length(), _move.MaxForce*FrameTime())
-    self:GetPhysicsObject():ApplyForceCenter(force)
+	local error = _move.Target - self:GetPos()
+	_move.TE = _move.TE + error/time
+	_move.DE = error/time - _move.LE - error:GetNormal()*_move.MaxSpeed
+	_move.LE = error/time
+	local force = _move.P*error + _move.I*_move.TE + _move.D*_move.DE
+	--force = Angle(force:GetNormalized()):Right()*math.min(force:Length(), _move.MaxForce)
+	--self:GetPhysicsObject():AddAngleVelocity(force - self:GetPhysicsObject():GetAngleVelocity())
+	force = force:GetNormal() * math.min(force:Length(), _move.MaxForce*FrameTime())
+	self:GetPhysicsObject():ApplyForceCenter(force)
 end
