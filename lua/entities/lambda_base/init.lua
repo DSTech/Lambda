@@ -67,22 +67,22 @@ function ENT:Order(command)
 end
 
 local defaultMoveTable = {
-    Target = nil,
-    OnTarget = false,
-    TargetThreshold = 10,
-    MaxSpeed = 100,
-    MaxForce = 200,
-    UserData = nil,
-    P = 100,
-    I = 0,
-    D = -2,
-    LE = Vector(0,0,0),
-    TE = Vector(0,0,0),
-    DE = Vector(0,0,0)
+	Target = nil,
+	OnTarget = false,
+	TargetThreshold = 10,
+	MaxSpeed = 100,
+	MaxForce = 200,
+	UserData = nil,
+	P = 100,
+	I = 0,
+	D = -2,
+	LE = Vector(0,0,0),
+	TE = Vector(0,0,0),
+	DE = Vector(0,0,0)
 }
 
 function ENT:initMovement()
-    self._move = {}
+	self._move = {}
 	for k,v in pairs(defaultMoveTable)do
 		self._move[k] = v
 	end
