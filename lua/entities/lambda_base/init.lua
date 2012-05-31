@@ -52,8 +52,10 @@ end
 function ENT:Think()
 	if(self:mustMove())then
 		self:performMovement()
+	else
+		self:holdPosition()
 	end
-	self:NextThink(CurTime()+0.0025)
+	self:NextThink(CurTime()+0.03)
 	return true
 end
 
@@ -69,13 +71,13 @@ end
 local defaultMoveTable = {
 	Target = nil,
 	OnTarget = false,
-	TargetThreshold = 10,
+	TargetThreshold = 20,
 	MaxSpeed = 100,
-	MaxForce = 200,
+	MaxForce = 450,
 	UserData = nil,
-	P = 100,
-	I = 0,
-	D = -2,
+	P=100,
+	I=0.01,
+	D=-2,
 	LE = Vector(0,0,0),
 	TE = Vector(0,0,0),
 	DE = Vector(0,0,0)
@@ -97,10 +99,20 @@ function ENT:setMoveTarget(pos, udata)
 	_move.LE = Vector(0,0,0)
 end
 
+function ENT:clearMoveTarget()
+	self._move.UserData = nil
+	self._move.Target = nil
+end
+
 function ENT:mustMove()
 	local _move = self._move
 	if _move.Target == nil then return nil end
 	_move.OnTarget = (_move.Target - self:GetPos()):LengthSqr() < math.pow(_move.TargetThreshold, 2)
+	if(_move.OnTarget and _move.Target)then
+		local oldtarg, udata = _move.Target, _move.UserData
+		self:clearMoveTarget()
+		if(self.Arrival)then self:Arrival(oldtarg, udata) end
+	end
 	return ( not _move.OnTarget )
 end
 
@@ -112,8 +124,20 @@ function ENT:performMovement()
 	_move.DE = error/time - _move.LE - error:GetNormal()*_move.MaxSpeed
 	_move.LE = error/time
 	local force = _move.P*error + _move.I*_move.TE + _move.D*_move.DE
-	--force = Angle(force:GetNormalized()):Right()*math.min(force:Length(), _move.MaxForce)
-	--self:GetPhysicsObject():AddAngleVelocity(force - self:GetPhysicsObject():GetAngleVelocity())
-	force = force:GetNormal() * math.min(force:Length(), _move.MaxForce*FrameTime())
+	force = force:GetNormal() * math.min(force:Length(), _move.MaxForce*time)
 	self:GetPhysicsObject():ApplyForceCenter(force)
+end
+
+function ENT:holdPosition()
+	local physobject = self:GetPhysicsObject()
+	if not physobject then
+		return
+	end
+	local curvel = physobject:GetVelocity()
+	physobject:ApplyForceCenter((-curvel):GetNormal() * math.min(curvel:Length(), self._move.MaxForce*FrameTime()))
+	physobject:AddAngleVelocity(-physobject:GetAngleVelocity())
+end
+
+function ENT:Arrival(pos, udata)
+	print("I have arrived at "..tostring(pos).."!")
 end
