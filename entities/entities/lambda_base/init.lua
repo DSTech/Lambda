@@ -55,7 +55,7 @@ function ENT:Think()
 	else
 		self:holdPosition()
 	end
-	self:NextThink(CurTime()+0.03)
+	self:NextThink(CurTime()+(self.Delay or 0.25))
 	return true
 end
 
@@ -68,20 +68,11 @@ function ENT:Order(command)
 	end
 end
 
-local defaultMoveTable = {
-	Target = nil,
-	OnTarget = false,
-	TargetThreshold = 20,
-	MaxSpeed = 100,
-	MaxForce = 450,
-	UserData = nil,
-	P=100,
-	I=0.01,
-	D=-2,
-	LE = Vector(0,0,0),
-	TE = Vector(0,0,0),
-	DE = Vector(0,0,0)
-}
+Target = nil,
+OnTarget = false,
+TargetThreshold = 20,
+MaxSpeed = 100,
+MaxForce = 450,
 
 function ENT:initMovement()
 	self._move = {}
