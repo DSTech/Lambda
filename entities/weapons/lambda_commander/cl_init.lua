@@ -60,7 +60,7 @@ function SWEP:StartRightClick()
 	if(tr.Hit)then
 		local cursel = {}--New selection storage
 		for k,v in pairs(self.selection)do
-			cursel[k]=v--Copy over selection
+			table.insert(cursel,v)--Copy over selection to numeric style
 		end
 		self:Order({type="move",pos=tr.HitPos}, cursel)--Send new copy of selection alongside the order
 	end
