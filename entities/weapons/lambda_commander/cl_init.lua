@@ -230,6 +230,7 @@ function SWEP:Order(command, units)
 	end
 	net.Start("Lambda Order")
 	net.WriteString(cmdstring)
+	net.WriteUInt(#unitarr, 16)
 	for k,v in pairs(unitarr)do
 		net.WriteEntity(v)
 	end
