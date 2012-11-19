@@ -7,3 +7,5 @@ ENT.Purpose = "Base Unit for Lambda";
 ENT.Instructions = "Doesn't actually do anything unless modified by an expansion script.";
 ENT.Spawnable = true;
 ENT.AdminSpawnable = true;
+
+ENT.lambda = true--Is commandable unit
