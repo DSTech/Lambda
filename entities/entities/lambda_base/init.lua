@@ -4,9 +4,9 @@ AddCSLuaFile("shared.lua");
 
 function ENT:SpawnFunction(ply, tr)
 	if ( !tr.Hit ) then return end
- 
+	
 	local SpawnPos = tr.HitPos + tr.HitNormal * 36
- 
+	
 	local teamToSpawnOn = dTeams:getTeam(ply)
 	if not(teamToSpawnOn)then
 		ply:ChatPrint("Please choose a team before spawning Lambda Entities.")
@@ -26,7 +26,10 @@ function ENT:Initialize()
 	self.MaxMoveForce = 1000
 	self.Gravity = true
 	self.Radius = 8.25
-	self.NextAttack = CurTime()
+	self.Mass = nil
+	self.curtime = CurTime()
+	self.lasttime = self.curtime - (self.Delay or 0.25)
+	self.NextAttack = self.curtime
 	self.TeamColor = dTeams:getTeamColor(self)
 	self.MelonModel = "models/props_junk/watermelon01.mdl"
 	if self.Move ~= nil && self.TargetVec == nil then
@@ -45,17 +48,19 @@ function ENT:Initialize()
 		physics:EnableGravity(self.Gravity);
 		physics:SetDamping(0.75,0.75)
 		self.Entity:SetColor(self.TeamColor)
+		if(self.Mass)then
+			physics:SetMass(self.Mass)
+		end
 	end
 	self:initMovement()
 end
 
 function ENT:Think()
-	if(self:mustMove())then
-		self:performMovement()
-	else
-		self:holdPosition()
-	end
-	self:NextThink(CurTime()+(self.Delay or 0.25))
+	self.curtime = CurTime()
+	self.deltaTime = self.curtime - self.lasttime
+	self:performMovement()
+	self:NextThink(self.curtime+(self.Delay or 0.25))
+	self.lasttime = self.curtime
 	return true
 end
 
@@ -67,12 +72,12 @@ function ENT:Order(command)
 		self:setMoveTarget(command.pos)
 	end
 end
-
-Target = nil,
-OnTarget = false,
-TargetThreshold = 20,
-MaxSpeed = 100,
-MaxForce = 450,
+local defaultMoveTable = {
+	Target = nil;
+	OnTarget = false;
+	TargetThreshold = 25;
+	MaxForce = 450;
+}
 
 function ENT:initMovement()
 	self._move = {}
@@ -85,9 +90,6 @@ function ENT:setMoveTarget(pos, udata)
 	local _move = self._move
 	_move.UserData = udata
 	_move.Target = pos
-	_move.TE = Vector(0,0,0)
-	_move.DE = Vector(0,0,0)
-	_move.LE = Vector(0,0,0)
 end
 
 function ENT:clearMoveTarget()
@@ -108,15 +110,24 @@ function ENT:mustMove()
 end
 
 function ENT:performMovement()
-	local time = FrameTime()
-	local _move = self._move
-	local error = _move.Target - self:GetPos()
-	_move.TE = _move.TE + error/time
-	_move.DE = error/time - _move.LE - error:GetNormal()*_move.MaxSpeed
-	_move.LE = error/time
-	local force = _move.P*error + _move.I*_move.TE + _move.D*_move.DE
-	force = force:GetNormal() * math.min(force:Length(), _move.MaxForce*time)
-	self:GetPhysicsObject():ApplyForceCenter(force)
+	if(self:mustMove())then
+		local _move = self._move
+		local deltaTime = self.deltaTime
+		local force
+		if(isvector(_move.Target))then
+			force = _move.Target - self:GetPos()
+		elseif(isentity(_move.Target))then
+			force = _move.Target:GetPos() - self:GetPos()
+		else
+			return
+		end
+		force = force:GetNormal() * self._move.MaxForce * self.deltaTime
+		local physobject = self:GetPhysicsObject()
+		physobject:ApplyForceCenter(force)
+		physobject:SetDamping(2, 0)
+	else
+		self:holdPosition()
+	end
 end
 
 function ENT:holdPosition()
@@ -125,8 +136,10 @@ function ENT:holdPosition()
 		return
 	end
 	local curvel = physobject:GetVelocity()
-	physobject:ApplyForceCenter((-curvel):GetNormal() * math.min(curvel:Length(), self._move.MaxForce*FrameTime()))
-	physobject:AddAngleVelocity(-physobject:GetAngleVelocity())
+	self.Entity:SetVelocity(self.Entity:GetVelocity() * 0.05)
+	--physobject:ApplyForceCenter((-curvel):GetNormal() * math.min((curvel * physobject:GetMass()):Length(), self._move.MaxForce*self.deltaTime))
+	--physobject:AddAngleVelocity(-physobject:GetAngleVelocity())
+	physobject:SetDamping(2, 2)
 end
 
 function ENT:Arrival(pos, udata)
