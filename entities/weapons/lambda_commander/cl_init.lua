@@ -62,7 +62,15 @@ function SWEP:StartRightClick()
 		for k,v in pairs(self.selection)do
 			table.insert(cursel,v)--Copy over selection to numeric style
 		end
-		self:Order({type="move",pos=tr.HitPos}, cursel)--Send new copy of selection alongside the order
+		local shift = self.Owner:KeyDown(IN_SPEED)
+		local alt = self.Owner:KeyDown(IN_WALK)
+		local order = {
+			type="move";
+			pos=tr.HitPos;
+			queue=shift or alt;
+			patrol=alt;
+		}
+		self:Order(order, cursel)--Send new copy of selection alongside the order
 	end
 end
 function SWEP:EndRightClick()
