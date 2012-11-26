@@ -70,7 +70,7 @@ function SWEP:StartRightClick()
 			queue=shift or alt;
 			patrol=alt;
 		}
-		self:Order(order, cursel)--Send new copy of selection alongside the order
+		self:order(order, cursel)--Send new copy of selection alongside the order
 	end
 end
 function SWEP:EndRightClick()
@@ -225,7 +225,7 @@ function SWEP:DrawRadialSelection(center, edge)
 	cam.End3D()
 end
 
-function SWEP:Order(command, units)
+function SWEP:order(command, units)
 	if not(command and units and #units > 0)then
 		return false
 	end

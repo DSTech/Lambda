@@ -29,5 +29,5 @@ function assignOrder(commander, order, entity)
 			or type(entity.Order)~="function")then
 		return false
 	end
-	entity:Order(order)
+	entity:order(order)
 end

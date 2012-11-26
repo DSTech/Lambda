@@ -77,7 +77,7 @@ function ENT:initOrders()
 	self.orders = {}
 end
 
-function ENT:Order(order)
+function ENT:order(order)
 	if(order.queue)then
 		table.insert(self.orders, order)
 		if not(self.activeOrder)then
@@ -101,7 +101,7 @@ function ENT:fetchOrder()
 			local pos = order.pos
 			self:setMoveTarget(order.pos, function(self)
 				self:clearMoveTarget()
-				self:Order({type="move", patrol=true, queue=true, pos=pos})
+				self:order({type="move", patrol=true, queue=true, pos=pos})
 				self.activeOrder = false
 				return self:fetchOrder()
 			end)
