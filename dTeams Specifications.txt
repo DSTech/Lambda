@@ -4,7 +4,7 @@ Unset team variable should be assumed as neutral, and should therefore not quali
 	nor should they be counted as allies.
 
 Targetting of enemy units should not be done by checking if the questioned unit is an ally, but rather that it is an enemy,
-	this is to allow allow .
+	this is to allow truces to exist between teams without explicit alliances.
 	Example:
 		if(dTeams:isEnemy(self, target))then...
 	Wrong:
